@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Music</title>
+  <link rel="stylesheet" href="/stylesheet/edit.css">
+</head>
+<body>
+  <h1>Edit Music</h1>
+  <form action="/edit/<%= music._id %>" method="POST" enctype="multipart/form-data">
+    <label>Music Name:</label>
+    <input type="text" name="name" value="<%= music.name %>" required><br>
+    <label>Music File (MP3):</label>
+    <input type="file" name="musicFile" accept="audio/mp3"><br>
+    <label>Image URL:</label>
+    <input type="text" name="imageUrl" value="<%= music.imageUrl %>" required><br>
+    <button type="submit">Update Music</button>
+  </form>
+  <a href="/">Back to Collection</a>
+</body>
+</html>

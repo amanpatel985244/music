@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Collection</title>
+  <link rel="stylesheet" href="/stylesheet/index.css">
+</head>
+<body>
+  <h1>Music Collection</h1>
+  
+  <a href="/create" class="add-music-btn">Add New Music</a>
+  
+  <div class="music-container">
+    <% musicList.forEach(music => { %>
+      <div class="music-card">
+        <img src="<%= music.imageUrl %>" alt="<%= music.name %>">
+        <h3><%= music.name %></h3>
+        
+        <!-- Audio Element -->
+        <audio id="audio-<%= music._id %>" class="audio-player" ontimeupdate="updateProgress('<%= music._id %>')">
+          <source src="/music/<%= music._id %>" type="audio/mp3">
+          Your browser does not support the audio element.
+        </audio>
+
+        <!-- Custom Music Controls -->
+        <div class="music-controls">
+          <button class="play-btn" onclick="togglePlay('<%= music._id %>')" id="btn-<%= music._id %>">▶ Play</button>
+          
+          <input type="range" class="progress-bar" id="progress-<%= music._id %>" value="0" min="0" step="1" onchange="seekAudio('<%= music._id %>')">
+        </div>
+
+        <!-- Edit & Delete Buttons -->
+        <div class="controls">
+          <form action="/edit/<%= music._id %>" method="get">
+            <button type="submit" class="edit-btn">Edit</button>
+          </form>
+          <form action="/delete/<%= music._id %>" method="post">
+            <button type="submit" class="delete-btn">Delete</button>
+          </form>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+
+  <script>
+    function togglePlay(id) {
+      const audio = document.getElementById('audio-' + id);
+      const button = document.getElementById('btn-' + id);
+
+      if (audio.paused) {
+        document.querySelectorAll('audio').forEach(a => a.pause());
+        document.querySelectorAll('.play-btn').forEach(btn => btn.textContent = '▶ Play');
+
+        audio.play();
+        button.textContent = '⏸ Pause';
+      } else {
+        audio.pause();
+        button.textContent = '▶ Play';
+      }
+    }
+
+    function updateProgress(id) {
+      const audio = document.getElementById('audio-' + id);
+      const progressBar = document.getElementById('progress-' + id);
+
+      // Update the progress bar value and max
+      progressBar.max = audio.duration;
+      progressBar.value = audio.currentTime;
+
+      // Highlight the played portion in green
+      const percentage = (audio.currentTime / audio.duration) * 100;
+      progressBar.style.background = `linear-gradient(to right, #1db954 ${percentage}%, #ddd ${percentage}%)`;
+    }
+
+    function seekAudio(id) {
+      const audio = document.getElementById('audio-' + id);
+      const progressBar = document.getElementById('progress-' + id);
+
+      audio.currentTime = progressBar.value;
+    }
+  </script>
+</body>
+</html>
