@@ -10,8 +10,11 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 
+// Ignore favicon requests
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
 // Set up multer for file uploads
-const storage = multer.memoryStorage(); // Store files in memory as buffers
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -29,7 +32,7 @@ app.get('/create', (req, res) => {
 
 app.post('/create', upload.single('musicFile'), async (req, res) => {
   const { name, imageUrl } = req.body;
-  const musicBuffer = req.file.buffer; // The uploaded MP3 file as a Buffer
+  const musicBuffer = req.file.buffer;
 
   await Music.create({ name, music: musicBuffer, imageUrl });
   res.redirect('/');
@@ -45,7 +48,7 @@ app.post('/edit/:id', upload.single('musicFile'), async (req, res) => {
   const updateData = { name, imageUrl };
   
   if (req.file) {
-    updateData.music = req.file.buffer;  // Update the music file if a new one is uploaded
+    updateData.music = req.file.buffer;
   }
 
   await Music.findByIdAndUpdate(req.params.id, updateData);
@@ -60,8 +63,7 @@ app.post('/delete/:id', async (req, res) => {
 app.get('/music/:id', async (req, res) => {
     const music = await Music.findById(req.params.id);
     res.set('Content-Type', 'audio/mp3');
-    res.send(music.music);  // Send the stored music as the response
-  });
-  
+    res.send(music.music);
+});
 
 app.listen(3000, () => console.log('Server started on http://localhost:3000'));
